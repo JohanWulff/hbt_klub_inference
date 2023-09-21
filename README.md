@@ -59,4 +59,4 @@ Like above just add the -p flag and change the model name if running addBranch f
 
 ## Available Models
 
-Both sripts requirea a model to be specified. Right now the possible arguments are: nonparam_baseline, param_baseline
+Both sripts require a model to be specified. Right now the possible arguments are: nonparam_baseline, param_baseline
