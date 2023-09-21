@@ -1,4 +1,3 @@
-import json
 from glob import glob
 import os
 from argparse import ArgumentParser
@@ -18,8 +17,6 @@ Samples")
                         help="Dir to write output files to")
     parser.add_argument("-m", "--model_name" ,type=str,
                         help="model name. bsp. parametrised_baseline")
-    parser.add_argument("-j", "--json", type=str,
-                        help="JSON File containing paths to samples")
     parser.add_argument("-p", "--parametrised" ,action="store_true",
                         help="set this flag if evaluating a param. model")
     parser.add_argument("-b", '--broken', type=str, default="", required=False,
