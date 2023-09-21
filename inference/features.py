@@ -1,0 +1,23 @@
+feats = {"nonparam_baseline" : 
+    [['sv_mt', 'met_pT', 'dR_b1_b2', 'sv_E',
+      'bjet1_HHbtag', 'll_mt', 'sv_mass', 'dR_l1_l2_x_sv_pT', 'dau2_pt',
+      'l_1_mt', 'HHKin_mass_raw_chi2', 'h_bb_mass', 'top_1_mass',
+      'hh_pT', 'dphi_hbb_met', 'deta_l1_l2', 'bjet1_CvsB',
+      'bjet2_CvsB', 'bjet1_CvsL'],
+    ['isBoosted', 'channel', 'has_vbf_pair']],
+    "param_baseline" : [['sv_mt', 'met_pT', 'dR_b1_b2', 'sv_E',
+      'bjet1_HHbtag', 'll_mt', 'sv_mass', 'dR_l1_l2_x_sv_pT', 'dau2_pt',
+      'l_1_mt', 'HHKin_mass_raw_chi2', 'h_bb_mass', 'top_1_mass',
+      'hh_pT', 'dphi_hbb_met', 'deta_l1_l2','res_mass', 'bjet1_CvsB',
+      'bjet2_CvsB', 'bjet1_CvsL'],
+    ['isBoosted', 'channel', 'has_vbf_pair', 'spin']],
+"nmc" : [['sv_mt', 'met_pT', 'dR_b1_b2', 'sv_E', 'bjet1_HHbtag', 'll_mt',
+          'sv_mass', 'dR_l1_l2_x_sv_pT', 'dau1_pt', 'l_1_mt', 'HHKin_mass_raw_chi2',
+          'h_bb_mass', 'top_1_mass', 'hh_pT', 'dphi_hbb_met', 'deta_l1_l2', 'b_1_cvsb',
+          'b_2_cvsb', 'b_1_cvsl',],
+        ['isBoosted', 'channel', 'has_vbf_pair', 'jet_1_quality', 'jet_2_quality', 'spin']],
+"nmc_cont_feats_param" : [['HHKin_mass_raw_chi2', 'sv_mass', 'dau2_pt', 'res_mass', 'l_1_mt', 'dR_l1_l2_x_sv_pT', 'h_bb_mass',
+                        'diH_mass_met', 'dR_l1_l2', 'HHKin_mass_raw', 'deta_hbb_httvis', 'bjet2_HHbtag', 'sv_mt', 'b_1_cvsl',
+                        'b_1_cvsb', 'b_2_cvsb'],
+                        ['isBoosted', 'channel', 'has_vbf_pair', 'jet_1_quality', 'jet_2_quality', 'spin', 'year']]
+}
