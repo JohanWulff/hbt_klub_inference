@@ -55,3 +55,8 @@ python3 write_dag_addBranch.py -s ~/new/afs/submit_dir -d /eos/user/l/lportale/h
 ```
 
 Like above just add the -p flag and change the model name if running addBranch for a parametrised model
+
+
+## Available Models
+
+Both sripts requirea a model to be specified. Right now the possible arguments are: nonparam_baseline, param_baseline
