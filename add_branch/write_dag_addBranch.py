@@ -10,10 +10,12 @@ def make_parser():
 Samples")
     parser.add_argument("-s", "--submit_base", type=str, 
                         help="Base dir to submit from")
+    parser.add_argument("-d", "--skims_dir", type=str, 
+                        help="KLUB skims dir. ")
+    parser.add_argument("-o", "--pred_dir", type=str, 
+                        help="outdir where the predictions were stored.")
     parser.add_argument("-m", "--model_name" ,type=str,
                         help="model name. ex: parametrised_baseline")
-    parser.add_argument("-y", "--year", type=str, 
-                        help="16, 17 or 18")
     parser.add_argument("-p", "--parametrised" ,action="store_true",
                         help="set this flag if evaluating a param. model")
     return parser
