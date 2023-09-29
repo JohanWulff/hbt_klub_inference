@@ -165,11 +165,11 @@ def evaluate_file_condor(input_file_path: str, output_path: str, model_name: str
         output_array = evaluate_events(input_array, model_name=model_name)
 
     # set prediction to -1 for all events not passing baseline selection
-    index_arr = cut_arr[klub_index_cols]
+    out_arr = cut_arr[klub_index_cols]
     for field in output_array.fields:
         new_array = (-1*np.ones(len(baseline_mask)))
         new_array[baseline_mask] = output_array[field]
-        out_arr = ak.with_field(index_arr, new_array, field)
+        out_arr = ak.with_field(out_arr, new_array, field)
     # save the output as root
     # since we're using condor and the xrootd file transfer, 
     # we only need to write to the cwd
