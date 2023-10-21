@@ -16,7 +16,7 @@ import numpy as np
 import uproot
 
 # load the nn evaluation
-from first_nn import evaluate_events, evaluate_events_param, evaluate_events_mass_param, nn_columns
+from first_nn import evaluate_events, evaluate_events_param, nn_columns
 from feature_calc import spin2id
 
 #

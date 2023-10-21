@@ -5,7 +5,7 @@ import vector
 import pickle
 
 from helpers import get_num_btag, get_vbf_pair, jet_cat_lookup, adjust_svfit_feats
-from helpers import calc_mt, calc_top_masses, get_cvsb_flag, get_jet_quality
+from helpers import calc_mt, calc_top_masses, get_jet_quality
 
 id2year = {0: 2016, 1: 2017, 2: 2018}
 year2id = {id2year[i]: i for i in id2year}

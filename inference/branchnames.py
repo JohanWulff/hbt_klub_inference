@@ -1,25 +1,11 @@
 klub_index_cols = ["EventNumber", "RunNumber", "lumi"]
 
-klub_weight_cols = [
-    "MC_weight",
-    "prescaleWeight",
-    "L1pref_weight",
-    "PUjetID_SF",
-    "PUReweight",
-    "bTagweightReshape",
-    "trigSF",
-    "IdAndIsoAndFakeSF_deep_pt",
-    "DYscale_MTT",
-    "customTauIdSF",
-]
-
 klub_H_cols = [ "tauH_mass", "tauH_pt", "tauH_eta", "tauH_phi", "tauH_e",
     "tauH_SVFIT_pt", "tauH_SVFIT_eta", "tauH_SVFIT_phi", "tauH_SVFIT_mass",
     "bH_mass", "bH_pt", "bH_eta", "bH_phi", "bH_e",
     "HH_mass", "HH_mass_raw", "HH_pt", "HH_eta", "HH_phi", "HH_e",
     "HHKin_mass_raw", "HHKin_mass_raw_chi2", "MT2",
 ]
-
 
 klub_selection_cols = [
     "pairType",
@@ -61,4 +47,4 @@ klub_region_cols = [
     "dau2_deepTauVsJet",
 ]
 
-nn_columns = klub_index_cols + klub_weight_cols + klub_H_cols + klub_selection_cols + klub_lep_cols + klub_met_cols + klub_b_cols + klub_vbf_cols + klub_region_cols
+nn_columns = klub_index_cols + klub_H_cols + klub_selection_cols + klub_lep_cols + klub_met_cols + klub_b_cols + klub_vbf_cols + klub_region_cols

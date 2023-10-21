@@ -7,7 +7,6 @@ from typing import List
 import numpy as np
 import awkward as ak
 
-from branchnames import *  # noqa
 from feature_calc import *  # noqa
 from features import feats 
 
