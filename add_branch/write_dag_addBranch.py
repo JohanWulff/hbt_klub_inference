@@ -8,15 +8,15 @@ from subprocess import Popen, PIPE
 def make_parser():
     parser = ArgumentParser(description="Submit predicting of LLR \
 Samples")
-    parser.add_argument("-s", "--submit_base", type=str, 
+    parser.add_argument("-s", "--submit_base", required=True,
                         help="Base dir to submit from")
-    parser.add_argument("-d", "--skims_dir", type=str, 
+    parser.add_argument("-d", "--skims_dir", required=True,
                         help="KLUB skims dir. ")
-    parser.add_argument("-o", "--pred_dir", type=str, 
+    parser.add_argument("-o", "--pred_dir", required=True,
                         help="outdir where the predictions were stored.")
-    parser.add_argument("-m", "--model_name" ,type=str,
+    parser.add_argument("-m", "--model_name", required=True,
                         help="model name. ex: parametrised_baseline")
-    parser.add_argument("-p", "--parametrised" ,action="store_true",
+    parser.add_argument("-p", "--parametrised", action="store_true",
                         help="set this flag if evaluating a param. model")
     return parser
                             
