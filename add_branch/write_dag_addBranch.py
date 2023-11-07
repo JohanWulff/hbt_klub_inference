@@ -6,14 +6,13 @@ from subprocess import Popen, PIPE
 
 
 def make_parser():
-    parser = ArgumentParser(description="Submit predicting of LLR \
-Samples")
+    parser = ArgumentParser(description="add predictions to KLUB HTauTauTree")
     parser.add_argument("-s", "--submit_base", required=True,
                         help="Base dir to submit from")
     parser.add_argument("-d", "--skims_dir", required=True,
                         help="KLUB skims dir. ")
     parser.add_argument("-o", "--pred_dir", required=True,
-                        help="outdir where the predictions were stored.")
+                        help="/eos dir where prediction files are stored")
     parser.add_argument("-m", "--model_name", required=True,
                         help="model name. ex: parametrised_baseline")
     parser.add_argument("-p", "--parametrised", action="store_true",
@@ -52,11 +51,13 @@ cmsenv\n\
 cd -"
     file_str = f'#!/usr/bin/bash\n\
 {env_str}\n\
-filepath=$1\n\
+for file in $@; do\n\
+filepath=$file\n\
 filename="${{filepath##*/}}"\n\
 pred_file="{pred_dir}/$filename"\n\
 echo "running: addBranch -i $pred_file -t $filepath -n {model_name} -p {str(parametrised).lower()}"\n\
 addBranch -i $pred_file -t $filepath -n {model_name} -p {str(parametrised).lower()} || exit 1\n\
+done\n\
 exit 0'
     return file_str
 
@@ -87,9 +88,6 @@ def main(submit_base_dir: str,
         sample_name = sample_dir.split("/")[-1]
         print(f"Creating submission dir and writing dag \
 files for sample ({i+1}/{len(samples)})\r", end="")
-        # data samples are channel-dependant
-        if "Run" in sample_name:
-            continue
         # create /eos outdir for the sample
         submit_dir = submit_base_dir.rstrip("/")+f"/{sample_name}"
         if not os.path.exists(submit_dir):
@@ -100,12 +98,13 @@ files for sample ({i+1}/{len(samples)})\r", end="")
         #if not broken_files == "":
             #broken_list = 
         files = glob(f"{sample_dir}/*.root")
+        filechunks = [files[i:i+100] for i in range(0, len(files), 100)]
         if not os.path.exists(dagfile):
             with open(dagfile, "x") as dfile:
-                for file in files:
-                    jobid = file.split("/")[-1]
+                for chunk in filechunks:
+                    jobid = (chunk[0]).split("/")[-1]
                     print(f"JOB {jobid} {submitfile}", file=dfile)
-                    print(f'VARS {jobid} FILES="{file}"', file=dfile)
+                    print(f'VARS {jobid} FILES="{" ".join(chunk)}"', file=dfile)
         else:
             print(f"\n {dagfile} already exists.. Not creating new one \n")
         if not os.path.exists(submitfile):
