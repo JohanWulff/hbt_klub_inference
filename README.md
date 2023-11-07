@@ -1,6 +1,6 @@
 # hbt_klub_inference
 
-## setup
+## Setup
 
 to be executed on lxplus. 
 
@@ -12,27 +12,21 @@ git clone git@github.com:JohanWulff/hbt_klub_inference.git
 scram b -j 4
 ```
 
-##  1. Get predictions
+## Add existing predictions to KLUB files
 
-###  1. Create Job files 
+The predictions are located at `/eos/user/j/jowulff/res_HH/Condor_out/predictions/{model_name}/{year}`
 
-Example command for generating predictions with the _nonparam baseline_  model for 2017 skims
-
-```
-cd inference
-python3 write_dag_pred.py -s ~/afs/submit/dir -d /eos/user/l/lportale/hhbbtautau/skims/SKIMS_UL17 -o /eos/or/afs/outdir -m nonparam_baseline  
-```
-
-Example command for generating predictions with the _param baseline_ model for 2017 skims. __Note the -p flag!__
+##  1. Create submission dirs and .dag files.
 
 ```
-cd inference
-python3 write_dag_pred.py -s ~/afs/submit/dir -d /eos/user/l/lportale/hhbbtautau/skims/SKIMS_UL17 -o /eos/or/afs/outdir -m param_baseline  -p 
+cd hbt_klub_inference/add_branch
+python3 write_dag_addBranch.py -s ~/afs/submit_dir \
+                               -d /eos/user/l/lportale/hhbbtautau/skims/SKIMS_UL17/ \
+                               -o /eos/user/j/jowulff/res_HH/Condor_out/predictions/{model_name}/{year} \
+                               -m model_name
 ```
 
-This creates submission dirs and necessary files in the directory passed with the -s / --skims_dir argument. The .submit file contains instructions to start a singularity image for each job which has all of the necessary software installed, so no further installations are necessary. 
-
-###  2. Submit!
+## 2. Submit!
 
 ```
 cd ~/afs/submit/dir
@@ -45,18 +39,8 @@ rescue in case of failed jobs
 for dir in $(find . -mindepth 1 -maxdepth 1 -type d); do resc=$(find $dir -type f -name "*rescue001"); if [ ! -z $resc ]; then cd $dir ; condor_submit_dag *.dag; cd -; fi ; done
 ```
 
-## 2. Add predictions to KLUB files
-
-add the branches in the nonparam case
-
-```
-cd add_branch
-python3 write_dag_addBranch.py -s ~/new/afs/submit_dir -d /eos/user/l/lportale/hhbbtautau/skims/SKIMS_UL17/ -o /eos/or/afs/outdir/from/above -m nonparam_baseline
-```
-
-Like above just add the -p flag and change the model name if running addBranch for a parametrised model
-
+change 001 to 002 for a second round if necessary.
 
 ## Available Models
 
-Both sripts require a model to be specified. Right now the possible arguments are: nonparam_baseline, param_baseline
+Right now the possible arguments are: 30_10_23_param_allyears
