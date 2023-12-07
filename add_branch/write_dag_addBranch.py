@@ -51,9 +51,9 @@ def return_executable(pred_dir, cmssw_dir, model_name, parametrised):
 cmsenv\n\
 cd -"
     file_str = f'#!/usr/bin/bash\n\
-{env_str}\n\
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch\n\
 source $VO_CMS_SW_DIR/cmsset_default.sh\n\
+{env_str}\n\
 for file in $@; do\n\
 filepath=$file\n\
 filename="${{filepath##*/}}"\n\
