@@ -39,6 +39,7 @@ error                   = $(ClusterId).$(ProcId).err\n\
 output                  = $(ClusterId).$(ProcId).out\n\
 \n\
 MY.JobFlavour = \"espresso\"\n\
+MY.WantOS = \"el7\"\n\
 \n\
 Arguments = $(FILES)\n\
 queue"
@@ -51,6 +52,8 @@ cmsenv\n\
 cd -"
     file_str = f'#!/usr/bin/bash\n\
 {env_str}\n\
+export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
+source $VO_CMS_SW_DIR/cmsset_default.sh
 for file in $@; do\n\
 filepath=$file\n\
 filename="${{filepath##*/}}"\n\
