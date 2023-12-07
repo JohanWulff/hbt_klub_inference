@@ -16,7 +16,7 @@ scram b -j 4
 
 The predictions are located at `/eos/user/j/jowulff/res_HH/Condor_out/predictions/{model_name}/{year}`
 
-##  1. Create submission dirs and .dag files.
+###  1. Create submission dirs and .dag files.
 
 ```
 cd hbt_klub_inference/add_branch
@@ -26,7 +26,7 @@ python3 write_dag_addBranch.py -s ~/afs/submit_dir \
                                -m model_name
 ```
 
-## 2. Submit!
+### 2. Submit!
 
 ```
 cd ~/afs/submit/dir
@@ -41,6 +41,6 @@ for dir in $(find . -mindepth 1 -maxdepth 1 -type d); do resc=$(find $dir -type 
 
 change 001 to 002 for a second round if necessary.
 
-## Available Models
+### Available Models
 
 Right now the possible arguments are: 30_10_23_param_allyears
