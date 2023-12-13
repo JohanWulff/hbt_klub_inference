@@ -38,7 +38,7 @@ log                     = $(ClusterId).log\n\
 error                   = $(ClusterId).$(ProcId).err\n\
 output                  = $(ClusterId).$(ProcId).out\n\
 \n\
-MY.JobFlavour = \"espresso\"\n\
+MY.JobFlavour = \"microcentury\"\n\
 MY.WantOS = \"el7\"\n\
 \n\
 Arguments = $(FILES)\n\
@@ -101,7 +101,7 @@ files for sample ({i+1}/{len(samples)})\r", end="")
         #if not broken_files == "":
             #broken_list = 
         files = glob(f"{sample_dir}/*.root")
-        filechunks = [files[i:i+100] for i in range(0, len(files), 100)]
+        filechunks = [files[i:i+10] for i in range(0, len(files), 10)]
         if not os.path.exists(dagfile):
             with open(dagfile, "x") as dfile:
                 for chunk in filechunks:
