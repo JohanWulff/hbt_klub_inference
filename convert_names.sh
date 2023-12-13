@@ -13,27 +13,28 @@ function print_usage_submit_skims {
     USAGE="
         Run example: bash $(basename "$0") -d 
 
-        -h / --help[ ${HELP_STR} ]
-        -d [ ${BASEPATH_STR} ]
-        -n / --dry-run[ ${DRYRUN_STR} ]
+        -h / --help    [${HELP_STR}]
+        -d             [${BASEPATH_STR}]
+        -n / --dry-run [${DRYRUN_STR}]
 "
+    printf "${USAGE}"
 }
 
 while [[ $# -gt 0 ]]; do
     key=${1}
     case $key in
-	-h|--help)
-	    print_usage_submit_skims
-	    exit 1
-	    ;;
-	-n|--dry-run)
-	    DRYRUN="1"
-	    shift;
-	    ;;
-	-d)
-	    BASEPATH=${2}
-	    shift; shift;
-	    ;;
+		-h|--help)
+			print_usage_submit_skims
+			exit 1
+			;;
+		-n|--dry-run)
+			DRYRUN="1"
+			shift;
+			;;
+		-d)
+			BASEPATH=${2}
+			shift; shift;
+			;;
     esac
 done
 
@@ -216,7 +217,7 @@ for key in ${!TABLE[@]}; do
     value=${TABLE[${key}]}
 
     if [ -d ${BASEPATH}/${value} ]; then
-	comm="mv ${BASEPATH}/${value} ${BASEPATH}/${key}"
-	[[ ${DRYRUN} -eq 1 ]] && echo ${comm} || ${comm}
+		comm="mv ${BASEPATH}/${value} ${BASEPATH}/${key}"
+		[[ ${DRYRUN} -eq 1 ]] && echo ${comm} || ${comm}
     fi
 done

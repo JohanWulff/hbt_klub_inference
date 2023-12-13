@@ -18,6 +18,8 @@ The predictions are located at `/eos/user/j/jowulff/res_HH/Condor_out/prediction
 
 ###  1. Create submission dirs and .dag files.
 
+You need to use at least python version 3.6.
+
 ```
 cd hbt_klub_inference/add_branch
 python3 write_dag_addBranch.py -s ~/afs/submit_dir \
