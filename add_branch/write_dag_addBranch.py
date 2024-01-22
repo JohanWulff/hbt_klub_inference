@@ -13,8 +13,12 @@ def make_parser():
                         help="KLUB skims dir. ")
     parser.add_argument("-o", "--pred_dir", required=True,
                         help="/eos dir where prediction files are stored")
-    parser.add_argument("-m", "--model_name", required=True,
+    parser.add_argument("-n", "--model_name", required=True,
                         help="model name. ex: parametrised_baseline")
+    parser.add_argument("-m", "--multiclass", required=True,
+                        help="Whether or not this is a multiclass model")
+    parser.add_argument("--num_files", required=False, type=int,
+                        help="How many files to add per job.")
     return parser
                             
 
@@ -36,7 +40,7 @@ log                     = $(ClusterId).log\n\
 error                   = $(ClusterId).$(ProcId).err\n\
 output                  = $(ClusterId).$(ProcId).out\n\
 \n\
-MY.JobFlavour = \"espresso\"\n\
+MY.JobFlavour = \"microcentury\"\n\
 MY.WantOS = \"el7\"\n\
 \n\
 Arguments = $(FILES)\n\
@@ -44,7 +48,7 @@ queue"
     return file_str
 
 
-def return_executable(pred_dir, cmssw_dir, model_name, parametrised):
+def return_executable(pred_dir, cmssw_dir, model_name, multiclass):
     env_str = f"cd {cmssw_dir} || exit 1\n\
 cmsenv\n\
 cd -"
@@ -56,8 +60,8 @@ for file in $@; do\n\
 filepath=$file\n\
 filename="${{filepath##*/}}"\n\
 pred_file="{pred_dir}/$filename"\n\
-echo "running: addBranch -i $pred_file -t $filepath -n {model_name} -p {str(parametrised).lower()}"\n\
-addBranch -i $pred_file -t $filepath -n {model_name} -p {str(parametrised).lower()} || exit 1\n\
+echo "running: addBranch -i $pred_file -t $filepath -n {model_name} -m {str(multiclass).lower()}"\n\
+addBranch -i $pred_file -t $filepath -n {model_name} -m {str(multiclass).lower()} || exit 1\n\
 done\n\
 exit 0'
     return file_str
@@ -67,7 +71,8 @@ def main(submit_base_dir: str,
          skims_dir: str, 
          pred_dir: str, 
          model_name: str,
-         parametrised: bool,
+         multiclass: bool,
+         num_files: 100,
          cmssw_dir: str=os.getcwd()):
     # skims_dir=f"/eos/user/j/jowulff/res_HH/KLUB_skims/SKIMS_UL{year}"
     # pred_dir=f"/eos/user/j/jowulff/res_HH/Condor_out/predictions_individual/20{year}/{model_name}"
@@ -99,7 +104,7 @@ files for sample ({i+1}/{len(samples)})\r", end="")
         #if not broken_files == "":
             #broken_list = 
         files = glob(f"{sample_dir}/*.root")
-        filechunks = [files[i:i+100] for i in range(0, len(files), 100)]
+        filechunks = [files[i:i+num_files] for i in range(0, len(files), num_files)]
         if not os.path.exists(dagfile):
             with open(dagfile, "x") as dfile:
                 for chunk in filechunks:
@@ -118,7 +123,7 @@ files for sample ({i+1}/{len(samples)})\r", end="")
             executable_str = return_executable(f"{pred_dir}/{sample_name}",
                                                cmssw_dir,
                                                model_name,
-                                               parametrised)
+                                               multiclass)
             with open(afs_exe, "x") as exe:
                 print(executable_str, file=exe)
             prcs = Popen(f"chmod 744 {afs_exe}",shell=True, 
@@ -129,6 +134,8 @@ files for sample ({i+1}/{len(samples)})\r", end="")
                 raise ValueError(f"Unable to chmod {afs_exe} to 744")
         else:
             print(f"\n {afs_exe} already exists.. Not creating new one \n")
+
+
 if __name__ == "__main__":
     parser = make_parser()
     args = parser.parse_args()
@@ -136,4 +143,5 @@ if __name__ == "__main__":
          skims_dir=args.skims_dir,
          pred_dir=args.pred_dir,
          model_name=args.model_name,
-         parametrised=args.parametrised)
+         multiclass=args.multiclass,
+         num_files=args.num_files)
