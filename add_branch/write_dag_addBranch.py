@@ -15,8 +15,6 @@ def make_parser():
                         help="/eos dir where prediction files are stored")
     parser.add_argument("-m", "--model_name", required=True,
                         help="model name. ex: parametrised_baseline")
-    parser.add_argument("-p", "--parametrised", action="store_true",
-                        help="set this flag if evaluating a param. model")
     return parser
                             
 
