@@ -2,9 +2,10 @@
 
 ## Setup
 
-to be executed on lxplus. 
+to be executed on lxplus7. Doesn't work for lxplux9.
 
 ```
+ssh lxplus724
 export SCRAM_ARCH="slc7_amd64_gcc820"
 cmsrel CMSSW_12_2_4
 cd CMSSW_12_2_4/src
