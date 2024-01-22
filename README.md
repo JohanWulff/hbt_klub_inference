@@ -41,3 +41,13 @@ for dir in $(find . -mindepth 1 -maxdepth 1 -type d); do resc=$(find $dir -type 
 ```
 
 change 001 to 002 for a second round if necessary.
+
+
+### test addBranch command itself:
+
+```
+addBranch -i /eos/user/j/jowulff/res_HH/test_skims/DNN/SKIM_ZZZ/output_0.root \
+          -t /eos/user/j/jowulff/res_HH/test_skims/KLUB/SKIMS_UL17/SKIM_ZZZ/output_0.root \
+          -n hbtresdnn \
+          -m true
+```
