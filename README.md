@@ -5,6 +5,7 @@
 to be executed on lxplus. 
 
 ```
+export SCRAM_ARCH="slc7_amd64_gcc820"
 cmsrel CMSSW_12_2_4
 cd CMSSW_12_2_4/src
 cmsenv
