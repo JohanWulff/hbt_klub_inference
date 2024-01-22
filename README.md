@@ -8,13 +8,13 @@ to be executed on lxplus.
 cmsrel CMSSW_12_2_4
 cd CMSSW_12_2_4/src
 cmsenv
-git clone git@github.com:JohanWulff/hbt_klub_inference.git
+git clone -b hbtresdnn git@github.com:JohanWulff/hbt_klub_inference.git
 scram b -j 4
 ```
 
 ## Add existing predictions to KLUB files
 
-The predictions are located at `/eos/user/j/jowulff/res_HH/Condor_out/predictions/{model_name}/{year}`
+TBA: location of predition files on lxplus/eos
 
 ###  1. Create submission dirs and .dag files.
 
@@ -22,7 +22,7 @@ The predictions are located at `/eos/user/j/jowulff/res_HH/Condor_out/prediction
 cd hbt_klub_inference/add_branch
 python3 write_dag_addBranch.py -s ~/afs/submit_dir \
                                -d /eos/user/l/lportale/hhbbtautau/skims/SKIMS_UL17/ \
-                               -o /eos/user/j/jowulff/res_HH/Condor_out/predictions/{model_name}/{year} \
+                               -o /eos/user/j/jowulff/res_HH/predictions/{model_name}/{year} \
                                -m model_name
 ```
 
@@ -40,7 +40,3 @@ for dir in $(find . -mindepth 1 -maxdepth 1 -type d); do resc=$(find $dir -type 
 ```
 
 change 001 to 002 for a second round if necessary.
-
-### Available Models
-
-Right now the possible arguments are: 30_10_23_param_allyears
