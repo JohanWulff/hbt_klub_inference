@@ -2,13 +2,11 @@
 
 ## Setup
 
-to be executed on lxplus7. Doesn't work for lxplux9.
-
+to be executed on lxplus9 
 ```
-ssh lxplus724
-export SCRAM_ARCH="slc7_amd64_gcc820"
-cmsrel CMSSW_12_2_4
-cd CMSSW_12_2_4/src
+export SCRAM_ARCH="el8_amd64_gcc12"
+cmsrel CMSSW_14_0_0
+cd CMSSW_14_0_0/src
 cmsenv
 git clone -b hbtresdnn git@github.com:JohanWulff/hbt_klub_inference.git
 scram b -j 4
