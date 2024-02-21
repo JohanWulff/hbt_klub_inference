@@ -9,8 +9,8 @@ void show_help() {
     /* Show help for input arguments */
     std::cout << "-i : input root file (containing predictions), no default \n";
     std::cout << "-t : target root file, no default \n";
-    std::cout << "-n : model name, no default\n";
-    std::cout << "-m : multiclass, default: false \n";
+    std::cout << "-n : model name, no default \n";
+    std::cout << "-m : multiclass, default: true \n";
     //std::cout << "-p : parametrised, default: false \n";
 }
 
@@ -22,7 +22,7 @@ std::map<std::string, std::string> get_options(int argc, char* argv[]) {
     options.insert(std::make_pair("-i", std::string()));
     options.insert(std::make_pair("-t", std::string()));
     options.insert(std::make_pair("-n", std::string("hbtresdnn")));
-    options.insert(std::make_pair("-m", std::string("false")));
+    options.insert(std::make_pair("-m", std::string("true")));
     //options.insert(std::make_pair("-p", std::string("false")));
     if (argc >= 2) { //Check if help was requested
         std::string option(argv[1]);
