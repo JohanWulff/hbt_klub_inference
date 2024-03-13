@@ -11,7 +11,7 @@ void show_help() {
     std::cout << "-t : target root file, no default \n";
     std::cout << "-n : model name, no default \n";
     std::cout << "-m : multiclass, default: true \n";
-    //std::cout << "-p : parametrised, default: false \n";
+    std::cout << "-p : parametrised, default: false \n";
 }
 
 
@@ -23,7 +23,7 @@ std::map<std::string, std::string> get_options(int argc, char* argv[]) {
     options.insert(std::make_pair("-t", std::string()));
     options.insert(std::make_pair("-n", std::string("hbtresdnn")));
     options.insert(std::make_pair("-m", std::string("true")));
-    //options.insert(std::make_pair("-p", std::string("false")));
+    options.insert(std::make_pair("-p", std::string("true")));
     if (argc >= 2) { //Check if help was requested
         std::string option(argv[1]);
         if (option == "-h" || option == "--help") {
@@ -62,10 +62,10 @@ bool fill_new(std::string targ_file, std::string predictions_file, std::string m
     
     Long64_t nentries = klub_tree->GetEntries();
     Long64_t nentries_p = pred_tree->GetEntries();
-    if (nentries != nentries_p){
-        std::cout << "Number of Entries in both trees don't match" << std::endl;
-        return false;
-    }
+    //if (nentries != nentries_p){
+        //std::cout << "Number of Entries in both trees don't match" << std::endl;
+        //return false;
+    //}
     for (Long64_t i=0;i<nentries;i++) {
         pred_tree->GetEntry(i);
         newbranch->Fill();
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]){
     std::cout << "input file (-i): " << options["-i"] << "\n";
     std::cout << "target file (-t): " << options["-t"] << "\n";
     std::cout << "name (-n): " << options["-n"] << "\n";
-    //std::cout << "parametrised (-p): " << options["-p"] << "\n";
+    std::cout << "parametrised (-p): " << options["-p"] << "\n";
     std::cout << "multiclass (-m): " << options["-m"] << "\n";
 
     
@@ -101,23 +101,40 @@ int main(int argc, char *argv[]){
     // loop over spins
     for (int i = 0; i < 2; i++)
     {
-        // loop over masses
-        for (int j = 0; j < 25; j++)
-        {
-            int mass = masses[j];
-            int spin = spins[i];
-            // loop over classes
+        if (parametrised){
+            // loop over masses
+            for (int j = 0; j < 25; j++)
+            {
+                int mass = masses[j];
+                int spin = spins[i];
+                // loop over classes
+                if (multiclass){
+                    for (int k = 0; k < 3; k++){
+                        std::string branch_name(options["-n"]);
+                        std::string class_name = classes[k];hbt_klub_inference
+                        branch_name += "_mass"+std::to_string(mass)+"_spin"+std::to_string(spin)+"_"+class_name;
+                        fill_new(options["-t"], options["-i"], branch_name);
+                    }
+                }
+                else{
+                    std::string branch_name(options["-n"]);
+                    branch_name += "_mass"+std::to_string(mass)+"_spin"+std::to_string(spin);
+                    fill_new(options["-t"], options["-i"], branch_name);
+                }
+            }
+        }
+        else{
             if (multiclass){
                 for (int k = 0; k < 3; k++){
                     std::string branch_name(options["-n"]);
                     std::string class_name = classes[k];
-                    branch_name += "_mass"+std::to_string(mass)+"_spin"+std::to_string(spin)+"_"+class_name;
+                    branch_name += "_spin"+std::to_string(spin)+"_"+class_name;
                     fill_new(options["-t"], options["-i"], branch_name);
                 }
             }
             else{
                 std::string branch_name(options["-n"]);
-                branch_name += "_mass"+std::to_string(mass)+"_spin"+std::to_string(spin);
+                branch_name += "_spin"+std::to_string(spin);
                 fill_new(options["-t"], options["-i"], branch_name);
             }
         }
