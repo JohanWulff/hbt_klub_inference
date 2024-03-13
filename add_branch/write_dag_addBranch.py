@@ -1,4 +1,7 @@
-import json
+import uproot
+import re
+import hashlib
+
 from glob import glob
 import os
 from argparse import ArgumentParser
@@ -7,16 +10,22 @@ from subprocess import Popen, PIPE
 
 def make_parser():
     parser = ArgumentParser(description="add predictions to KLUB HTauTauTree")
-    parser.add_argument("-s", "--submit_base", required=True,
+    parser.add_argument("--submit_base", required=True,
                         help="Base dir to submit from")
-    parser.add_argument("-d", "--skims_dir", required=True,
+    parser.add_argument("--skims_dir", required=True,
                         help="KLUB skims dir. ")
-    parser.add_argument("-o", "--pred_dir", required=True,
+    parser.add_argument("--pred_dir", required=True,
                         help="/eos dir where prediction files are stored")
-    parser.add_argument("-n", "--model_name", required=True,
+    parser.add_argument("--model_name", required=True,
                         help="model name. ex: parametrised_baseline")
-    parser.add_argument("-m", "--multiclass", required=True,
-                        help="Whether or not this is a multiclass model")
+    parser.add_argument("--masses", required=False, nargs="+", type=int, default=None,
+                        help="masses to add branches for")
+    parser.add_argument("--spins", required=False, nargs="+", type=int, default=None,
+                        help="spins to add branches for")
+    parser.add_argument("--classes", required=False, nargs="+", type=str, default=None,
+                        help="classes to add branches for")
+    parser.add_argument("--shapes", required=False, nargs="+", type=str, default=None,
+                        help="shapes to add branches for")
     parser.add_argument("--num_files", required=False, type=int,
                         help="How many files to add per job.")
     return parser
@@ -40,7 +49,7 @@ log                     = $(ClusterId).log\n\
 error                   = $(ClusterId).$(ProcId).err\n\
 output                  = $(ClusterId).$(ProcId).out\n\
 \n\
-MY.JobFlavour = \"microcentury\"\n\
+MY.JobFlavour = \"longlunch\"\n\
 MY.WantOS = \"el7\"\n\
 \n\
 Arguments = $(FILES)\n\
@@ -48,7 +57,7 @@ queue"
     return file_str
 
 
-def return_executable(pred_dir, cmssw_dir, model_name, multiclass):
+def return_executable(pred_dir, cmssw_dir, branchfile, model_name):
     env_str = f"cd {cmssw_dir} || exit 1\n\
 cmsenv\n\
 cd -"
@@ -60,23 +69,84 @@ for file in $@; do\n\
 filepath=$file\n\
 filename="${{filepath##*/}}"\n\
 pred_file="{pred_dir}/$filename"\n\
-echo "running: addBranch -i $pred_file -t $filepath -n {model_name} -m {str(multiclass).lower()}"\n\
-addBranch -i $pred_file -t $filepath -n {model_name} -m {str(multiclass).lower()} || exit 1\n\
+echo "running: addBranch -i $pred_file -t $filepath --branches {branchfile} -n {model_name}"\n\
+addBranch -i $pred_file -t $filepath --branches {branchfile} -n {model_name}|| exit 1\n\
 done\n\
 exit 0'
     return file_str
 
 
+def match_branches(filename,
+                   masses,
+                   spins,
+                   classes,
+                   shapes,
+                   treename="hbtres",
+                   model_name="hbtresdnn"):
+    """
+    return a list of branches that match regex
+
+    branches look like:
+    {model_name}_mass[250-3000]_spin[0,2]_{hh,tt,dy} (nominal)
+    {model_name}_mass[250-3000]_spin[0,2]_{hh,tt,dy}_{tes,ees,jes}_{up,down} (with shapes)
+    """
+    masses_str = "|".join(map(str, masses))
+    spins_str = "|".join(map(str, spins))
+    classes_str = "|".join(classes)
+    shapes_str = "|".join(shapes)
+
+    pattern = rf"{model_name}_({masses_str})_spin({spins_str})_({classes_str})(_({shapes_str})_(up|down))?"
+    regex = re.compile(pattern)
+    file = uproot.open(filename)
+    branches = file[treename].keys()
+    return [branch for branch in branches if regex.match(branch)]
+    
+
 def main(submit_base_dir: str,
-         skims_dir: str, 
-         pred_dir: str, 
-         model_name: str,
-         multiclass: bool,
-         num_files: 100,
-         cmssw_dir: str=os.getcwd()):
-    # skims_dir=f"/eos/user/j/jowulff/res_HH/KLUB_skims/SKIMS_UL{year}"
-    # pred_dir=f"/eos/user/j/jowulff/res_HH/Condor_out/predictions_individual/20{year}/{model_name}"
-    # check if it starts with /afs
+            skims_dir: str, 
+            pred_dir: str, 
+            model_name: str,
+            masses: list[int]|None,
+            spins: list[int]|None,
+            classes: list[str]|None,
+            shapes: list[str]|None,
+            num_files: 100,
+            cmssw_dir: str=os.getcwd()):
+    
+    if masses is None:
+        print("No masses given. Using default list (all 25).")
+        masses = [250, 260, 270, 280, 300,
+                  320, 350, 400, 450, 500,
+                  550, 600, 650, 700, 750,
+                  800, 850, 900, 1000, 1250,
+                  1500, 1750, 2000, 2500, 3000]
+    if spins is None:
+        print("No spins given. Using 0 and 2.")
+        spins = [0, 2]
+    if classes is None:
+        print("No classes given. Using tt, hh, dy.")
+        classes = ["tt", "hh", "dy"]
+    if shapes is None:
+        print("No shapes given. Using tes, ees, jes.")
+        shapes = ["tes", "ees", "jes"]
+
+    # create a hash of the branches to add
+    cache_key = [masses, spins, classes, shapes]
+    cache_hash = hashlib.sha256(str(cache_key).encode("utf-8")).hexdigest()[:10]
+    branchfile = f"./branches_{cache_hash}.txt"
+    branchfile_is_cached = os.path.exists(branchfile)
+    if branchfile_is_cached:
+        print(f"Branches are cached. Using cached file: {branchfile}.")
+    else:
+        print(f"Caching branches to {branchfile}.")
+        # open a file in the pred_dir to check which branches are available
+        pred_file = glob(pred_dir+"/SKIM_ZZZ/output_*.root")[0]
+        matched_branches = match_branches(pred_file, masses, spins, classes, shapes)
+        with open(branchfile, "w") as bfile:
+            # write all matched branches to the bfile
+            for branch in matched_branches:
+                print(branch, file=bfile)
+
     print(f"checking for files in {skims_dir}")
     samples = glob(skims_dir+"/SKIM_*")
     if len(samples) == 0:
@@ -84,7 +154,6 @@ def main(submit_base_dir: str,
         print(f"globbing all dirs in {skims_dir}")
         samples = glob(skims_dir+"/*")
         print(f"Found {len(samples)} samples")
-
 
     if not submit_base_dir.startswith("/afs"):
         raise ValueError("Submission must happen from /afs!")
@@ -122,8 +191,8 @@ files for sample ({i+1}/{len(samples)})\r", end="")
         if not os.path.exists(afs_exe):
             executable_str = return_executable(f"{pred_dir}/{sample_name}",
                                                cmssw_dir,
-                                               model_name,
-                                               multiclass)
+                                               branchfile,
+                                               model_name,)
             with open(afs_exe, "x") as exe:
                 print(executable_str, file=exe)
             prcs = Popen(f"chmod 744 {afs_exe}",shell=True, 
@@ -134,6 +203,9 @@ files for sample ({i+1}/{len(samples)})\r", end="")
                 raise ValueError(f"Unable to chmod {afs_exe} to 744")
         else:
             print(f"\n {afs_exe} already exists.. Not creating new one \n")
+        afs_branchfile = f"{submit_base_dir}/{sample_name}/{branchfile}"
+        if not os.path.exists(afs_branchfile):
+            os.system(f"cp {branchfile} {afs_branchfile}")
 
 
 if __name__ == "__main__":
@@ -143,5 +215,8 @@ if __name__ == "__main__":
          skims_dir=args.skims_dir,
          pred_dir=args.pred_dir,
          model_name=args.model_name,
-         multiclass=args.multiclass,
+         masses=args.masses,
+         spins=args.spins,
+         classes=args.classes,
+         shapes=args.shapes,
          num_files=args.num_files)
