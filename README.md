@@ -20,10 +20,9 @@ TBA: location of predition files on lxplus/eos
 
 ```
 cd hbt_klub_inference/add_branch
-python3 write_dag_addBranch.py -s ~/afs/submit_dir \
-                               -d /eos/user/l/lportale/hhbbtautau/skims/SKIMS_UL17/ \
-                               -o /eos/user/j/jowulff/res_HH/predictions/{model_name}/{year} \
-                               -m model_name
+python3 write_dag_addBranch.py --submit_base ~/afs/submit_dir \
+                               --skims_dir /eos/user/l/lportale/hhbbtautau/skims/SKIMS_UL17/ \
+                               --pred_dir /eos/user/j/jowulff/res_HH/predictions/{model_name}/{year}
 ```
 
 ### 2. Submit!
