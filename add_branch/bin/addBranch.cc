@@ -1,8 +1,10 @@
 #include <iostream>
 #include <string>
-#include<TFile.h>
-#include "TTree.h"
-#include "TBranch.h"
+#include <fstream>
+
+#include <TFile.h>
+#include <TTree.h>
+#include <TBranch.h>
 
 
 void show_help() {
@@ -48,23 +50,23 @@ std::map<std::string, std::string> get_options(int argc, char* argv[]) {
 
 bool fill_new(std::string targ_file,
               std::string predictions_file,
-              std::string targ_tree = "HTauTauTree",
-              std::string pred_tree = "hbtres",
-              std::string model_name) {
+              std::string branch_name,
+              std::string targ_treename = "HTauTauTree",
+              std::string pred_treename = "hbtres") {
 
     Float_t dnn_output; 
 
     TFile *pred_file = new TFile(predictions_file.c_str());
-    TTree *pred_tree = (TTree*)pred_file->Get(pred_tree.c_str());
-    pred_tree->SetBranchAddress(std::string(model_name).c_str(), &dnn_output);
+    TTree *pred_tree = (TTree*)pred_file->Get(pred_treename.c_str());
+    pred_tree->SetBranchAddress(std::string(branch_name).c_str(), &dnn_output);
 
     TFile *f = new TFile(targ_file.c_str(), "update");
-    TTree *klub_tree  = (TTree*)f->Get(targ_tree.c_str());
-    TBranch *newbranch = klub_tree->Branch(std::string(model_name).c_str(), &dnn_output, std::string(model_name+"/F").c_str());
+    TTree *klub_tree  = (TTree*)f->Get(targ_treename.c_str());
+    TBranch *newbranch = klub_tree->Branch(std::string(branch_name).c_str(), &dnn_output, std::string(branch_name+"/F").c_str());
 
     
     Long64_t nentries = klub_tree->GetEntries();
-    Long64_t nentries_p = pred_tree->GetEntries();
+    //Long64_t nentries_p = pred_tree->GetEntries();
     //if (nentries != nentries_p){
         //std::cout << "Number of Entries in both trees don't match" << std::endl;
         //return false;
@@ -87,19 +89,21 @@ int main(int argc, char *argv[]){
     }
     // branch naming convention: hbtresdnn_mass[250-3000]_spin[0,2]_[hh,dy,tt]
     std::cout << "Running add_branch with options:\n";
-    //bool parametrised = options["-p"] == "true";
-    bool multiclass = options["-m"] == "true";
     std::cout << "input file (-i): " << options["-i"] << "\n";
     std::cout << "target file (-t): " << options["-t"] << "\n";
-    std::cout << "name (-n): " << options["-n"] << "\n";
-    std::cout << "parametrised (-p): " << options["-p"] << "\n";
-    std::cout << "multiclass (-m): " << options["-m"] << "\n";
+    std::cout << "branches file (--branches): " << options["--branches"] << "\n";
+    std::cout << "input tree name (--input_tree): " << options["--input_tree"] << "\n";
+    std::cout << "target tree name (--target_tree): " << options["--target_tree"] << "\n";
+    std::cout << "model name (-n): " << options["-n"] << "\n";
 
 
     // instead of hardcoding all of the branches, we read them from a file
     std::string branch;
-    std::ifstream file(branch_file);
+    std::ifstream branches_file;
+    branches_file.open(options["--branches"]);
     
-    while (std::getline(file, branch)) {
-        fill_new(options["-t"], options["-i"], options["branch_name"]);
+    while (std::getline(branches_file, branch)) {
+        fill_new(options["-t"], options["-i"], branch, options["--target_tree"], options["--input_tree"]);
+    }
+    branches_file.close();
 }
