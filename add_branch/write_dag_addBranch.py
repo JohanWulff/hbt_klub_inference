@@ -2,6 +2,7 @@ import uproot
 import re
 import hashlib
 
+from typing import List, Union
 from glob import glob
 import os
 from argparse import ArgumentParser
@@ -16,16 +17,16 @@ def make_parser():
                         help="KLUB skims dir. ")
     parser.add_argument("--pred_dir", required=True,
                         help="/eos dir where prediction files are stored")
-    parser.add_argument("--model_name", required=True,
-                        help="model name. ex: parametrised_baseline")
+    parser.add_argument("--model_name", required=False, default="hbtres", type=str,
+                        help="model name (default: 'hbtres')")
     parser.add_argument("--masses", required=False, nargs="+", type=int, default=None,
-                        help="masses to add branches for")
+                        help="masses to add branches for. Default is all 25.")
     parser.add_argument("--spins", required=False, nargs="+", type=int, default=None,
-                        help="spins to add branches for")
+                        help="spins to add branches for. Default is 0 and 2.")
     parser.add_argument("--classes", required=False, nargs="+", type=str, default=None,
-                        help="classes to add branches for")
+                        help="classes to add branches for. Default is tt, hh, dy.")
     parser.add_argument("--shapes", required=False, nargs="+", type=str, default=None,
-                        help="shapes to add branches for")
+                        help="shapes to add branches for. Default is tes, ees, jes.")
     parser.add_argument("--num_files", required=False, type=int,
                         help="How many files to add per job.")
     return parser
@@ -95,10 +96,11 @@ def match_branches(filename,
     classes_str = "|".join(classes)
     shapes_str = "|".join(shapes)
 
-    pattern = rf"{model_name}_({masses_str})_spin({spins_str})_({classes_str})(_({shapes_str})_(up|down))?"
+    pattern = rf"{model_name}_mass({masses_str})_spin({spins_str})_({classes_str})(_({shapes_str})_(up|down))?"
     regex = re.compile(pattern)
     file = uproot.open(filename)
     branches = file[treename].keys()
+    from IPython import embed; embed()
     return [branch for branch in branches if regex.match(branch)]
     
 
@@ -106,10 +108,10 @@ def main(submit_base_dir: str,
             skims_dir: str, 
             pred_dir: str, 
             model_name: str,
-            masses: list[int]|None,
-            spins: list[int]|None,
-            classes: list[str]|None,
-            shapes: list[str]|None,
+            masses: Union[List[int],None],
+            spins: Union[List[int],None],
+            classes: Union[List[str],None], 
+            shapes: Union[List[str],None], 
             num_files: 100,
             cmssw_dir: str=os.getcwd()):
     
@@ -140,7 +142,7 @@ def main(submit_base_dir: str,
     else:
         print(f"Caching branches to {branchfile}.")
         # open a file in the pred_dir to check which branches are available
-        pred_file = glob(pred_dir+"/SKIM_ZZZ/output_*.root")[0]
+        pred_file = glob(pred_dir+"/*/output_*.root")[0]
         matched_branches = match_branches(pred_file, masses, spins, classes, shapes)
         with open(branchfile, "w") as bfile:
             # write all matched branches to the bfile
