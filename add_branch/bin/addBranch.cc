@@ -24,7 +24,6 @@ std::map<std::string, std::string> get_options(int argc, char* argv[]) {
     options.insert(std::make_pair("--branches", std::string()));
     options.insert(std::make_pair("--input_tree", std::string("hbtres")));
     options.insert(std::make_pair("--target_tree", std::string("HTauTauTree")));
-    options.insert(std::make_pair("-n", std::string("hbtresdnn")));
     if (argc >= 2) { //Check if help was requested
         std::string option(argv[1]);
         if (option == "-h" || option == "--help") {
@@ -94,7 +93,6 @@ int main(int argc, char *argv[]){
     std::cout << "branches file (--branches): " << options["--branches"] << "\n";
     std::cout << "input tree name (--input_tree): " << options["--input_tree"] << "\n";
     std::cout << "target tree name (--target_tree): " << options["--target_tree"] << "\n";
-    std::cout << "model name (-n): " << options["-n"] << "\n";
 
 
     // instead of hardcoding all of the branches, we read them from a file
