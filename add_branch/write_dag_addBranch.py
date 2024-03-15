@@ -17,8 +17,8 @@ def make_parser():
                         help="KLUB skims dir. ")
     parser.add_argument("--pred_dir", required=True,
                         help="/eos dir where prediction files are stored")
-    parser.add_argument("--model_name", required=False, default="hbtres", type=str,
-                        help="model name (default: 'hbtres')")
+    parser.add_argument("--model_name", required=False, default="hbtresdnn", type=str,
+                        help="model name (default: 'hbtresdnn')")
     parser.add_argument("--masses", required=False, nargs="+", type=int, default=None,
                         help="masses to add branches for. Default is all 25.")
     parser.add_argument("--spins", required=False, nargs="+", type=int, default=None,
@@ -100,7 +100,6 @@ def match_branches(filename,
     regex = re.compile(pattern)
     file = uproot.open(filename)
     branches = file[treename].keys()
-    from IPython import embed; embed()
     return [branch for branch in branches if regex.match(branch)]
     
 
